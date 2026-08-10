@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFETY GBH</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #16a34a;
+            --primary-hover: #15803d;
+            --primary-light: #dcfce7;
+        }
+        body {
+            /* ใช้ฟอนต์ Prompt เพื่อให้อ่านภาษาไทยได้สวยงามทันสมัย */
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Modern Background Elements */
+        .bg-shape-1 {
+            position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1; border-radius: 50%;
+        }
+        .bg-shape-2 {
+            position: absolute; bottom: -10%; right: -5%; width: 40vw; height: 40vw;
+            background: radial-gradient(circle, rgba(21,128,61,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1; border-radius: 50%;
+        }
+
+        /* Modal Styles with modern scale animation */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            transform: scale(0.95) translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modern Form Inputs */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #1e293b;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .form-input:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+            outline: none;
+        }
+        
+        /* Select Dropdown Arrow */
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2em;
+        }
+
+        /* Modern Buttons */
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f0fdf4;
+        }
+
+        /* Checkbox Customization */
+        .right-checkbox {
+            accent-color: var(--primary);
+            width: 1.1rem;
+            height: 1.1rem;
+            cursor: pointer;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Card Hover Effects */
+        .menu-card {
+            transition: all 0.3s ease;
+        }
+        .menu-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.1), 0 8px 10px -6px rgba(22, 163, 74, 0.1);
+            border-color: #86efac;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center">
+    
+    <!-- Background decorations -->
+    <div class="bg-shape-1"></div>
+    <div class="bg-shape-2"></div>
+
+    <header class="w-full fixed top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 py-4 px-6 flex items-center justify-center z-40">
+        <div class="flex items-center gap-2 text-green-700">
+            <h1 class="text-xl font-bold tracking-wide font-inter">SAFETY GBH</h1>
+        </div>
+    </header>
+
+    <main class="w-full max-w-md px-6 mt-20 z-10">
+        <div class="bg-white rounded-3xl p-8 shadow-xl shadow-slate-200/50 border border-slate-100 text-center relative overflow-hidden">
+            <!-- Decorative Top Banner -->
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
+            
+            <div class="flex justify-center mb-6 mt-2">
+                <div class="bg-green-50 text-green-600 p-4 rounded-2xl shadow-inner border border-green-100">
+                    <i class="ph-duotone ph-lock-key text-5xl"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">ยินดีต้อนรับสู่ระบบ</h2>
+            <p class="text-sm text-slate-500 mb-8">กรุณาเข้าสู่ระบบเพื่อเข้าถึงเมนูต่างๆ ด้านความปลอดภัย</p>
+            
+            <div class="space-y-4">
+                <button onclick="showModal('loginModal')" class="btn btn-primary">
+                    <i class="ph ph-sign-in text-xl"></i> ลงชื่อเข้าใช้
+                </button>
+                <button onclick="showModal('registerModal')" class="btn btn-outline">
+                    <i class="ph ph-user-plus text-xl"></i> สมัครสมาชิกใหม่
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content bg-white w-full max-w-sm m-4 p-8 rounded-3xl relative shadow-2xl">
+            <button onclick="hideModal('loginModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full p-1 transition">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            
+            <div class="flex justify-center mb-4">
+                <div class="bg-green-50 p-3 rounded-full text-green-600">
+                    <i class="ph ph-sign-in text-3xl"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-center text-slate-800 mb-1">ลงชื่อเข้าใช้</h3>
+            <p class="text-center text-xs text-slate-500 mb-6">กรอกชื่อผู้ใช้ของคุณเพื่อดำเนินการต่อ</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="relative mb-6">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1">ชื่อผู้ใช้ (Username)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                            <i class="ph ph-user text-lg"></i>
+                        </span>
+                        <input type="text" id="login-username" class="form-input" required placeholder="เช่น 001234">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal overflow-y-auto py-10">
+        <div class="modal-content bg-white w-full max-w-md m-4 p-8 rounded-3xl relative my-auto shadow-2xl">
+            <button onclick="hideModal('registerModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full p-1 transition">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            
+            <div class="flex flex-col items-center justify-center mb-6">
+                <div class="bg-green-50 p-3 rounded-full text-green-600 mb-2">
+                    <i class="ph ph-user-plus text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center text-slate-800">สมัครสมาชิกใหม่</h3>
+                <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลเพื่อขอสิทธิ์การเข้าถึงระบบ</p>
+            </div>
+            
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="space-y-4">
+                    <!-- Name -->
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-identification-card text-lg"></i></span>
+                        <input type="text" id="reg-name" class="form-input" required placeholder="ชื่อ-นามสกุล">
+                    </div>
+                    <!-- Nickname & Phone Grid -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-smiley text-lg"></i></span>
+                            <input type="text" id="reg-nickname" class="form-input" required placeholder="ชื่อเล่น">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-phone text-lg"></i></span>
+                            <input type="text" id="reg-phone" class="form-input" required placeholder="เบอร์โทรศัพท์">
+                        </div>
+                    </div>
+                    <!-- Branch Dropdown -->
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-buildings text-lg"></i></span>
+                        <select id="reg-branch" class="form-input" required>
+                            <option value="" disabled selected>กำลังโหลดข้อมูลสาขา...</option>
+                        </select>
+                    </div>
+                    <!-- Dept & Position Grid -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-users-three text-lg"></i></span>
+                            <input type="text" id="reg-dept" class="form-input" required placeholder="แผนก">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="ph ph-briefcase text-lg"></i></span>
+                            <input type="text" id="reg-position" class="form-input" required placeholder="ตำแหน่ง">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-xl my-6">
+                    <label class="block text-xs font-semibold text-slate-700 mb-2">กำหนดชื่อผู้ใช้ (Username) สำหรับเข้าสู่ระบบ</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-green-600"><i class="ph ph-key text-lg"></i></span>
+                        <input type="text" id="reg-username" class="form-input !pl-10 !border-green-200 focus:!border-green-500" required placeholder="เช่น 001234">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary shadow-md shadow-green-500/30">
+                    <i class="ph ph-check-circle text-lg"></i> ยืนยันการสมัคร
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="menuModal" class="modal">
+        <div class="modal-content bg-white w-full max-w-2xl m-4 p-6 md:p-8 rounded-3xl relative shadow-2xl flex flex-col max-h-[90vh]">
+            <button onclick="hideModal('menuModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full p-1 transition z-10">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 mb-1">
+                <div class="bg-green-100 p-2 rounded-lg text-green-600"><i class="ph ph-squares-four text-2xl"></i></div>
+                <h3 class="text-2xl font-bold text-slate-800">แผงควบคุมระบบ</h3>
+            </div>
+            <p id="userWelcome" class="text-sm text-slate-500 mb-6 pb-4 border-b border-slate-100"></p>
+            
+            <!-- Grid Layout for Menus -->
+            <div id="siteMenuContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto px-1 pb-4 flex-1">
+                <!-- Website buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content bg-white w-full max-w-5xl m-4 p-6 rounded-3xl relative h-[90vh] flex flex-col shadow-2xl">
+            <button onclick="hideModal('adminModal')" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 bg-slate-100 rounded-full p-1 transition z-10">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            
+            <div class="flex items-center gap-3 mb-6">
+                <div class="bg-slate-800 p-2.5 rounded-xl text-white shadow-lg"><i class="ph ph-gear-six text-2xl"></i></div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-800">Admin Dashboard</h3>
+                    <p class="text-xs text-slate-500">ระบบจัดการผู้ใช้และเว็บไซต์</p>
+                </div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex space-x-1 mb-6 bg-slate-100 p-1 rounded-xl w-fit">
+                <button onclick="switchAdminTab('rights')" id="tabRights" class="px-5 py-2 rounded-lg font-medium text-sm transition-all bg-white text-slate-800 shadow-sm flex items-center gap-2">
+                    <i class="ph-fill ph-users-three text-lg text-green-600"></i> จัดการสิทธิ์เข้าถึง
+                </button>
+                <button onclick="switchAdminTab('sites')" id="tabSites" class="px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-500 hover:text-slate-700 flex items-center gap-2">
+                    <i class="ph-fill ph-globe text-lg"></i> ข้อมูลเว็บไซต์
+                </button>
+            </div>
+
+            <div id="adminRightsContent" class="flex-1 flex flex-col overflow-hidden">
+                <div class="bg-white border border-slate-200 rounded-2xl flex-1 flex flex-col overflow-hidden">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-4 font-semibold">สถานะ</th>
+                                    <th class="p-4 font-semibold">วัน/เวลา</th>
+                                    <th class="p-4 font-semibold">ชื่อผู้ใช้ (Username)</th>
+                                    <th class="p-4 font-semibold">ชื่อ-นามสกุล</th>
+                                    <th class="p-4 font-semibold">กำหนดสิทธิ์ (เข้าถึงระบบ)</th>
+                                    <th class="p-4 font-semibold text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUserTable" class="divide-y divide-slate-100">
+                                <!-- User rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Container -->
+                    <div id="paginationContainer" class="bg-slate-50 border-t border-slate-200 p-4 flex items-center justify-between rounded-b-2xl">
+                        <!-- Pagination buttons injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="adminSitesContent" class="flex-1 overflow-y-auto hidden">
+                <div class="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-100 mb-6 flex items-start gap-3 text-sm">
+                    <i class="ph-fill ph-info text-xl text-blue-500 mt-0.5"></i>
+                    <div>
+                        <strong>ข้อมูลโครงสร้างเว็บไซต์ในระบบ</strong><br>
+                        ผู้ดูแลระบบสามารถตรวจสอบ ID สิทธิ์การเข้าถึงสำหรับใช้งานในหน้าจัดการสิทธิ์ได้จากตารางด้านล่างนี้
+                    </div>
+                </div>
+                <div id="adminSiteList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Site list injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === การตั้งค่าระบบ ===
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZeq557uZbw7sOyz2h20yNJp3SYdxUmBK1g1FMUvfRCRVA0wyIMsBZYFfaAOzR9Nz3ow/exec';
+        
+        // ข้อมูลเว็บไซต์มาตรฐาน
+        const defaultWebsites = [
+            { id: 'checklog', name: 'ติดตาม Check Sheet', icon: 'ph-clipboard-text', color: 'text-blue-500 bg-blue-50', url: 'https://mm12346.github.io/checklog/' },
+            { id: 'committeesafety', name: 'รายงาน คปอ.', icon: 'ph-chart-bar', color: 'text-purple-500 bg-purple-50', url: 'https://safetygbh.github.io/committee-gbh/' },
+            { id: 'safetytalk', name: 'Safety Talk', icon: 'ph-megaphone', color: 'text-orange-500 bg-orange-50', url: 'https://safetygbh.github.io/Safety-talk-GBH/' },
+            { id: 'safetypatrol', name: 'Safety Patrol', icon: 'ph-siren', color: 'text-red-500 bg-red-50', url: 'https://drive.google.com/drive/folders/1vUFxgyZ3QZxq16oOvchOCMrXxi716rIM?usp=sharing' },
+            { id: 'reportsafety', name: 'Report Safety', icon: 'ph-warning-circle', color: 'text-amber-500 bg-amber-50', url: 'https://safetygbh.github.io/Report-Safety/' },
+            { id: 'training', name: 'ขอบเขตการทำงาน จป.ว', icon: 'ph-graduation-cap', color: 'text-indigo-500 bg-indigo-50', url: 'https://gbhsafetytalkreport.my.canva.site/safety-training-gbh' }
+        ];
+
+        let websites = [...defaultWebsites];
+        let allUsersData = [];
+        
+        // Pagination Variables
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // UI Helpers
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        function preserveLeadingZero(val) {
+            if (!val) return val;
+            let str = val.toString().trim();
+            if (str.startsWith('0') && !str.startsWith("'")) {
+                return "'" + str;
+            }
+            return str;
+        }
+
+        window.onload = function() {
+            fetchBranches();
+        };
+
+        function fetchBranches() {
+            const branchSelect = document.getElementById('reg-branch');
+            
+            fetch(SCRIPT_URL + '?action=getBranches', { method: 'GET' })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status === 'success' && result.data.length > 0) {
+                        branchSelect.innerHTML = '<option value="" disabled selected>-- โปรดเลือกสาขา --</option>';
+                        result.data.forEach(branch => {
+                            const opt = document.createElement('option');
+                            opt.value = branch;
+                            opt.text = branch;
+                            branchSelect.appendChild(opt);
+                        });
+                    } else {
+                        branchSelect.outerHTML = '<input type="text" id="reg-branch" class="form-input" required placeholder="ระบุสาขา (เกิดข้อผิดพลาดในการโหลด)">';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching branches:', err);
+                    branchSelect.outerHTML = '<input type="text" id="reg-branch" class="form-input" required placeholder="ระบุสาขา">';
+                });
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('reg-name').value.trim(),
+                nickname: document.getElementById('reg-nickname').value.trim(),
+                phone: preserveLeadingZero(document.getElementById('reg-phone').value),
+                branch: document.getElementById('reg-branch').value, 
+                dept: document.getElementById('reg-dept').value.trim(),
+                position: document.getElementById('reg-position').value.trim(),
+                username: preserveLeadingZero(document.getElementById('reg-username').value)
+            };
+
+            Swal.fire({
+                title: 'กำลังบันทึกข้อมูล...',
+                text: 'โปรดรอสักครู่',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            const params = new URLSearchParams({
+                action: 'register',
+                data: JSON.stringify(data)
+            });
+
+            fetch(SCRIPT_URL, { method: 'POST', body: params })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'สมัครสมาชิกสำเร็จ กรุณารอ Admin อนุมัติสิทธิ์ และลงชื่อเข้าใช้' });
+                    document.getElementById('registerForm').reset();
+                    hideModal('registerModal');
+                } else {
+                    Swal.fire('ข้อผิดพลาด', result.message || 'Username นี้มีอยู่แล้ว', 'error');
+                }
+            })
+            .catch(error => {
+                // GET Fallback for CORS issues
+                fetch(SCRIPT_URL + '?' + params.toString(), { method: 'GET' })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                         Swal.fire({ icon: 'success', title: 'สำเร็จ', text: 'สมัครสมาชิกสำเร็จ กรุณารอ Admin อนุมัติสิทธิ์' });
+                         document.getElementById('registerForm').reset();
+                         hideModal('registerModal');
+                    } else {
+                         Swal.fire('ข้อผิดพลาด', result.message || 'Username นี้มีอยู่แล้ว', 'error');
+                    }
+                })
+                .catch(err2 => { Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อระบบได้', 'error'); });
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+
+            if (username === 'safetygbh99') {
+                hideModal('loginModal');
+                document.getElementById('loginForm').reset();
+                showAdminDashboard();
+                return;
+            }
+
+            Swal.fire({
+                title: 'กำลังตรวจสอบ...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            fetch(SCRIPT_URL + '?action=checkUser&username=' + encodeURIComponent(username), { method: 'GET' })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const rights = result.data.rights;
+                    if (!rights || rights === 'รออนุมัติ') {
+                        Swal.fire('รออนุมัติ', 'บัญชีของคุณยังไม่ได้รับการอนุมัติสิทธิ์ โปรดติดต่อ Admin', 'warning');
+                    } else {
+                        Swal.close();
+                        hideModal('loginModal');
+                        document.getElementById('loginForm').reset();
+                        renderUserMenu(username, rights);
+                    }
+                } else {
+                    Swal.fire('ไม่พบผู้ใช้', 'ชื่อผู้ใช้ไม่ถูกต้อง หรือรออนุมัติ', 'error');
+                }
+            })
+            .catch(error => {
+                // Mock Data for demonstration if URL fails
+                if(username === 'testuser' || username === '0123') {
+                     Swal.close(); hideModal('loginModal');
+                     renderUserMenu(username, 'checklog,safetytalk');
+                } else {
+                     Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อระบบได้', 'error');
+                }
+            });
+        }
+
+        function renderUserMenu(username, rightsStr) {
+            document.getElementById('userWelcome').innerHTML = `กำลังใช้งานโดย: <span class="font-semibold text-green-700">${username}</span>`;
+            const container = document.getElementById('siteMenuContainer');
+            container.innerHTML = '';
+            
+            const userRights = rightsStr.split(',').map(s => s.trim().toLowerCase());
+
+            websites.forEach(site => {
+                const btn = document.createElement('div');
+                const hasAccess = userRights.includes(site.id.toLowerCase());
+
+                if (hasAccess) {
+                    btn.className = 'menu-card bg-white border border-slate-200 p-5 rounded-2xl cursor-pointer flex flex-col justify-center h-full relative overflow-hidden group';
+                    btn.innerHTML = `
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-green-50 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                        <div class="${site.color} w-12 h-12 rounded-xl flex items-center justify-center mb-3">
+                            <i class="ph ${site.icon} text-2xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-slate-800 text-lg mb-1">${site.name}</h4>
+                        <div class="flex items-center gap-1 text-sm text-green-600 font-medium mt-2">
+                            เข้าสู่ระบบ <i class="ph ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    `;
+                    btn.onclick = () => window.open(site.url, '_blank');
+                } else {
+                    btn.className = 'bg-slate-50 border border-slate-100 p-5 rounded-2xl flex flex-col justify-center h-full relative overflow-hidden opacity-60 cursor-not-allowed';
+                    btn.innerHTML = `
+                        <div class="bg-slate-200 text-slate-400 w-12 h-12 rounded-xl flex items-center justify-center mb-3 grayscale">
+                            <i class="ph ${site.icon} text-2xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-slate-500 text-lg mb-1">${site.name}</h4>
+                        <div class="flex items-center gap-1 text-xs font-medium text-slate-400 mt-2 bg-slate-200/50 w-max px-2 py-1 rounded-md">
+                            <i class="ph-fill ph-lock-key"></i> ไม่อนุญาตให้เข้าถึง
+                        </div>
+                    `;
+                    btn.onclick = () => Swal.fire('ไม่อนุญาต', 'คุณไม่มีสิทธิ์เข้าถึงเมนูนี้ โปรดติดต่อ Admin', 'error');
+                }
+
+                container.appendChild(btn);
+            });
+
+            showModal('menuModal');
+        }
+
+        function showAdminDashboard() {
+            showModal('adminModal');
+            currentPage = 1; // Reset to page 1
+            loadAdminUsers();
+            renderAdminSites();
+        }
+
+        function switchAdminTab(tab) {
+            const rightsTab = document.getElementById('tabRights');
+            const sitesTab = document.getElementById('tabSites');
+            const rightsContent = document.getElementById('adminRightsContent');
+            const sitesContent = document.getElementById('adminSitesContent');
+
+            if (tab === 'rights') {
+                rightsTab.className = 'px-5 py-2 rounded-lg font-medium text-sm transition-all bg-white text-slate-800 shadow-sm flex items-center gap-2';
+                rightsTab.innerHTML = '<i class="ph-fill ph-users-three text-lg text-green-600"></i> จัดการสิทธิ์เข้าถึง';
+                sitesTab.className = 'px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-500 hover:text-slate-700 flex items-center gap-2';
+                
+                rightsContent.classList.remove('hidden');
+                sitesContent.classList.add('hidden');
+            } else {
+                sitesTab.className = 'px-5 py-2 rounded-lg font-medium text-sm transition-all bg-white text-slate-800 shadow-sm flex items-center gap-2';
+                sitesTab.innerHTML = '<i class="ph-fill ph-globe text-lg text-blue-600"></i> ข้อมูลเว็บไซต์';
+                rightsTab.className = 'px-5 py-2 rounded-lg font-medium text-sm transition-all text-slate-500 hover:text-slate-700 flex items-center gap-2';
+                
+                sitesContent.classList.remove('hidden');
+                rightsContent.classList.add('hidden');
+            }
+        }
+
+        function loadAdminUsers() {
+            const tbody = document.getElementById('adminUserTable');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="ph ph-spinner-gap ph-spin text-2xl mb-2"></i><br>กำลังโหลดข้อมูล...</td></tr>';
+            
+            fetch(SCRIPT_URL + '?action=getAllUsers', { method: 'GET' })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    allUsersData = result.data;
+                    renderAdminUserTable();
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-red-400"><i class="ph-fill ph-warning-circle text-2xl mb-2"></i><br>ไม่สามารถโหลดข้อมูลได้</td></tr>';
+                }
+            })
+            .catch(err => {
+                // Mock Data
+                allUsersData = [
+                    { username: '0123', name: 'สมชาย ใจดี', rights: 'รออนุมัติ', timestamp: new Date().toISOString() },
+                    { username: '00456', name: 'สมศรี มีสุข', rights: 'checklog,safetytalk', timestamp: new Date(Date.now() - 86400000).toISOString() }
+                ];
+                renderAdminUserTable();
+            });
+        }
+
+        function renderAdminUserTable() {
+            const tbody = document.getElementById('adminUserTable');
+            tbody.innerHTML = '';
+
+            // --- การจัดเรียง (Sorting) ---
+            // การบันทึกล่าสุด (ใหม่สุด) ขึ้นก่อนเสมอ (Timestamp Descending)
+            allUsersData.sort((a, b) => {
+                let dateA = new Date(a.timestamp).getTime();
+                let dateB = new Date(b.timestamp).getTime();
+                if(isNaN(dateA)) dateA = 0;
+                if(isNaN(dateB)) dateB = 0;
+                
+                return dateB - dateA; // ใหม่สุด (ค่ามาก) ไปเก่าสุด (ค่าน้อย)
+            });
+
+            if (allUsersData.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่มีข้อมูลผู้ใช้งาน</td></tr>';
+                 document.getElementById('paginationContainer').innerHTML = '';
+                 return;
+            }
+
+            // --- การแบ่งหน้า (Pagination) ---
+            const totalPages = Math.ceil(allUsersData.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+            
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentData = allUsersData.slice(startIndex, endIndex);
+
+            currentData.forEach((user, index) => {
+                // สร้าง index แบบ unique สำหรับอ้างอิง checkbox ในหน้านี้
+                const uiIndex = index; 
+                
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition-colors group';
+                
+                const isPending = (!user.rights || user.rights.trim() === 'รออนุมัติ');
+                const statusBadge = isPending 
+                    ? `<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-medium flex items-center w-max gap-1"><i class="ph-fill ph-clock-counter-clockwise"></i> รออนุมัติ</span>`
+                    : `<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-medium flex items-center w-max gap-1"><i class="ph-fill ph-check-circle"></i> อนุมัติแล้ว</span>`;
+
+                const dateStr = user.timestamp ? new Date(user.timestamp).toLocaleString('th-TH', {dateStyle:'short', timeStyle:'short'}) : '-';
+                
+                let checkboxesHTML = `<div class="grid grid-cols-2 lg:grid-cols-3 gap-2 min-w-[350px]">`;
+                const userRightsArr = user.rights ? user.rights.split(',').map(s=>s.trim().toLowerCase()) : [];
+                
+                websites.forEach(site => {
+                    const isChecked = userRightsArr.includes(site.id.toLowerCase()) ? 'checked' : '';
+                    checkboxesHTML += `
+                        <label class="flex items-center space-x-1.5 cursor-pointer bg-white border border-slate-200 px-2 py-1 rounded-md hover:border-green-400 transition-colors">
+                            <input type="checkbox" class="right-checkbox user-right-cb-${uiIndex}" value="${site.id}" ${isChecked}>
+                            <span class="text-xs text-slate-600 truncate" title="${site.name}">${site.name}</span>
+                        </label>
+                    `;
+                });
+                checkboxesHTML += `</div>`;
+
+                tr.innerHTML = `
+                    <td class="p-4 border-b border-slate-100">${statusBadge}</td>
+                    <td class="p-4 border-b border-slate-100 text-xs text-slate-500">${dateStr}</td>
+                    <td class="p-4 border-b border-slate-100 font-semibold text-slate-700">${user.username}</td>
+                    <td class="p-4 border-b border-slate-100 text-slate-600">${user.name}</td>
+                    <td class="p-4 border-b border-slate-100">${checkboxesHTML}</td>
+                    <td class="p-4 border-b border-slate-100 text-right">
+                        <button onclick="saveUserRights('${user.username}', ${uiIndex})" class="bg-white border border-green-500 text-green-600 hover:bg-green-50 hover:shadow text-xs px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-1.5 ml-auto transition-all">
+                            <i class="ph-bold ph-floppy-disk text-sm"></i> บันทึก
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            const container = document.getElementById('paginationContainer');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = `<div class="text-sm text-slate-500 w-full text-center">แสดงทั้งหมด ${allUsersData.length} รายการ</div>`;
+                return;
+            }
+
+            const startItem = ((currentPage - 1) * itemsPerPage) + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, allUsersData.length);
+
+            container.innerHTML = `
+                <div class="text-sm text-slate-500">
+                    แสดง <span class="font-semibold text-slate-700">${startItem}-${endItem}</span> จากทั้งหมด <span class="font-semibold text-slate-700">${allUsersData.length}</span> รายการ
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} 
+                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}">
+                        <i class="ph-bold ph-caret-left mr-1"></i> ก่อนหน้า
+                    </button>
+                    
+                    <div class="px-3 py-1.5 bg-slate-100 rounded-md text-sm font-medium text-slate-600">
+                        หน้า ${currentPage} / ${totalPages}
+                    </div>
+
+                    <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} 
+                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'}">
+                        ถัดไป <i class="ph-bold ph-caret-right ml-1"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function changePage(step) {
+            currentPage += step;
+            renderAdminUserTable();
+        }
+
+        function saveUserRights(username, uiIndex) {
+            const checkboxes = document.querySelectorAll(`.user-right-cb-${uiIndex}:checked`);
+            let selectedRights = Array.from(checkboxes).map(cb => cb.value).join(',');
+            
+            if(selectedRights === '') selectedRights = 'รออนุมัติ'; 
+
+            const btn = document.activeElement;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> รอ...';
+            btn.disabled = true;
+
+            const url = `${SCRIPT_URL}?action=updateRights&username=${encodeURIComponent(username)}&rights=${encodeURIComponent(selectedRights)}`;
+            
+            fetch(url, { method: 'GET' })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    Swal.fire({ title: 'บันทึกสำเร็จ', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                    // Update local data and re-render (maintains sort logic automatically)
+                    const userObj = allUsersData.find(u => u.username === username);
+                    if(userObj) userObj.rights = selectedRights;
+                    renderAdminUserTable();
+                } else {
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถบันทึกสิทธิ์ได้', 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire({ title: 'จำลองการบันทึกสำเร็จ', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                const userObj = allUsersData.find(u => u.username === username);
+                if(userObj) userObj.rights = selectedRights;
+                renderAdminUserTable();
+            })
+            .finally(() => {
+                if(document.body.contains(btn)) {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        function renderAdminSites() {
+            const container = document.getElementById('adminSiteList');
+            container.innerHTML = '';
+            websites.forEach((site) => {
+                container.innerHTML += `
+                    <div class="flex items-center gap-4 p-4 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-slate-300 transition-colors">
+                        <div class="${site.color} w-14 h-14 rounded-xl flex items-center justify-center shrink-0">
+                            <i class="ph ${site.icon} text-3xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-bold text-slate-800 text-base truncate">${site.name}</p>
+                            <p class="text-[11px] font-mono text-slate-400 bg-slate-50 border border-slate-100 rounded px-1.5 py-0.5 mt-1 truncate max-w-full">${site.url}</p>
+                            <p class="text-xs font-semibold text-green-600 mt-2 flex items-center gap-1"><i class="ph-fill ph-tag"></i> ID สิทธิ์: ${site.id}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
