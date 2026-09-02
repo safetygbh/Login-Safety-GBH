@@ -374,15 +374,16 @@
         // === การตั้งค่าระบบ ===
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZeq557uZbw7sOyz2h20yNJp3SYdxUmBK1g1FMUvfRCRVA0wyIMsBZYFfaAOzR9Nz3ow/exec';
         
-        // ข้อมูลเว็บไซต์มาตรฐาน
+        // ข้อมูลเว็บไซต์มาตรฐาน (เพิ่ม e-Work Permit)
         const defaultWebsites = [
             { id: 'accidentreport', name: 'Accident Report', icon: 'ph-shield-warning', color: 'text-rose-500 bg-rose-50', url: 'https://mm12346.github.io/AccidentReport/', public: true },
             { id: 'checklog', name: 'ติดตาม Check Sheet', icon: 'ph-clipboard-text', color: 'text-blue-500 bg-blue-50', url: 'https://mm12346.github.io/checklog/' },
             { id: 'committeesafety', name: 'รายงาน คปอ.', icon: 'ph-chart-bar', color: 'text-purple-500 bg-purple-50', url: 'https://safetygbh.github.io/committee-gbh/' },
             { id: 'safetytalk', name: 'Safety Talk', icon: 'ph-megaphone', color: 'text-orange-500 bg-orange-50', url: 'https://safetygbh.github.io/Safety-talk-GBH/' },
-            { id: 'safetypatrol', name: 'Safety Patrol', icon: 'ph-siren', color: 'text-red-500 bg-red-50', url: 'https://drive.google.com/drive/folders/1vUFxgyZ3QZxq16oOvchOCMrXxi716rIM?usp=sharing' },
+            { id: 'safetypatrol', name: 'Safety Patrol', icon: 'ph-siren', color: 'text-red-500 bg-red-50', url: 'https://safetygbh.github.io/safety-patrol-gbh/' },
             { id: 'reportsafety', name: 'Report Safety', icon: 'ph-warning-circle', color: 'text-amber-500 bg-amber-50', url: 'https://safetygbh.github.io/Report-Safety/' },
-            { id: 'training', name: 'ขอบเขตการทำงาน จป.ว', icon: 'ph-graduation-cap', color: 'text-indigo-500 bg-indigo-50', url: 'https://gbhsafetytalkreport.my.canva.site/safety-training-gbh' }
+            { id: 'training', name: 'ขอบเขตการทำงาน จป.ว', icon: 'ph-graduation-cap', color: 'text-indigo-500 bg-indigo-50', url: 'https://gbhsafetytalkreport.my.canva.site/safety-training-gbh' },
+            { id: 'workpermit', name: 'e-Work Permit', icon: 'ph-shield-check', color: 'text-teal-500 bg-teal-50', url: 'https://safetygbh.github.io/workpermit-gbh/' }
         ];
 
         let websites = [...defaultWebsites];
@@ -524,7 +525,7 @@
                 // Mock Data for demonstration if URL fails
                 if(username === 'testuser' || username === '0123') {
                      Swal.close(); hideModal('loginModal');
-                     renderUserMenu(username, 'checklog,safetytalk');
+                     renderUserMenu(username, 'checklog,safetytalk,workpermit');
                 } else {
                      Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อระบบได้', 'error');
                 }
@@ -623,7 +624,7 @@
                 // Mock Data
                 allUsersData = [
                     { username: '0123', name: 'สมชาย ใจดี', rights: 'รออนุมัติ', timestamp: new Date().toISOString() },
-                    { username: '00456', name: 'สมศรี มีสุข', rights: 'checklog,safetytalk', timestamp: new Date(Date.now() - 86400000).toISOString() }
+                    { username: '00456', name: 'สมศรี มีสุข', rights: 'checklog,safetytalk,workpermit', timestamp: new Date(Date.now() - 86400000).toISOString() }
                 ];
                 renderAdminUserTable();
             });
